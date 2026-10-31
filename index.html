@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TNK Games Arena - Multi-Game Web Arcade</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<!-- Google AdSense Script Placeholder -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+</head>
+<body>
+
+  <!-- Confetti Celebration Layer -->
+  <canvas id="celebrationCanvas"></canvas>
+
+  <!-- TOP BANNER (Identical on all screens) -->
+  <header class="tnk-banner">
+    <div class="logo-container" onclick="showHubView()">
+      <div class="logo-badge">TNK</div>
+      <div class="logo-text-group">
+        <span class="logo-title">TNK Arena</span>
+        <span class="logo-subtitle">GAME IT ENHANCE YOUR MIND</span>
+      </div>
+    </div>
+
+    <div class="banner-actions">
+      <div class="wallet-chip">
+        <span>🪙</span>
+        <span id="topWalletBalance" class="wallet-amount">100</span>
+        <span style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Coins</span>
+      </div>
+      <button id="btnNavHub" class="btn btn-secondary" onclick="showHubView()" style="display:none;">🏠 Game Hub</button>
+      <button class="btn btn-secondary" onclick="openNameModal()">✏️ Names</button>
+    </div>
+  </header>
+
+  <!-- ================= TOP ADSENSE BANNER CONTAINER ================= -->
+  <div class="adsense-slot-wrapper top-ad-slot">
+    <div class="adsense-placeholder">
+      <span class="ad-label">ADVERTISEMENT</span>
+      <p class="ad-subtext">Google AdSense Space (Responsive Leaderboard 728x90 / Top Banner)</p>
+    </div>
+  </div>
+
+  <!-- ================= VIEW 1: HOME PAGE GAMES HUB ================= -->
+  <main id="homeHubView">
+    <div class="hub-hero">
+      <div class="hub-hero-badge">Cyber Arcade Hub</div>
+      <h1 class="hub-hero-title">Select Your Game</h1>
+      <p class="hub-hero-subtitle">
+        Play neon grid duels (3x3, 4x4, 5x5) or strategic asymmetric board games with Player vs Computer mode. Each game is powered by its own modular file!
+      </p>
+    </div>
+
+    <div class="games-grid" id="gamesGridContainer">
+      <!-- Game 1 Card: Cyber Neon Tic-Tac-Toe -->
+      <div class="game-card" onclick="launchGame('tictactoe')">
+        <div class="game-card-banner neon-banner">
+          <span class="game-card-icon">⭕</span>
+          <span class="game-card-tag" style="color:#00f3ff;">Cyber Neon</span>
+        </div>
+        <div class="game-card-body">
+          <div class="game-card-title">Cyber Neon Tic-Tac-Toe</div>
+          <div class="game-card-desc">Futuristic arcade grid with glowing cyan X and neon pink O. Play 3x3, 4x4, or 5x5 against friends or Neural AI!</div>
+          <div class="game-card-meta">
+            <span class="game-card-rules">3x3, 4x4, 5x5 • Vs AI or 2P • 45s Timer</span>
+            <button class="btn btn-neon-blue">Play Now ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game 2 Card: Coin to Win (Puli-Maka) -->
+      <div class="game-card" onclick="launchGame('pulimaka')">
+        <div class="game-card-banner puli-banner">
+          <span class="game-card-icon">🐅</span>
+          <span class="game-card-tag" style="color:#ffaa00;">Strategy Board</span>
+        </div>
+        <div class="game-card-body">
+          <div class="game-card-title">Coin to Win (Puli-Maka)</div>
+          <div class="game-card-desc">Asymmetric 37-node tactical board with 2 Hunters vs 24 Defenders. Now featuring Player vs Computer mode!</div>
+          <div class="game-card-meta">
+            <span class="game-card-rules">Player vs Computer • 150 Moves Cap • 90s Timer</span>
+            <button class="btn btn-gold">Play Now ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game 3 Card: Cyber Neon Ludo -->
+      <div class="game-card" onclick="launchGame('ludo')">
+        <div class="game-card-banner" style="background: linear-gradient(135deg, #10061c, #071926); border-bottom: 2px solid #00f3ff;">
+          <span class="game-card-icon">🎲</span>
+          <span class="game-card-tag" style="color:#00ff88;">Cyber Ludo</span>
+        </div>
+        <div class="game-card-body">
+          <div class="game-card-title">Cyber Neon Ludo</div>
+          <div class="game-card-desc">Tactical 15x15 board with dynamic rolling dice, token-hopping animations, and screen-shake captures!</div>
+          <div class="game-card-meta">
+            <span class="game-card-rules">2P, 3P, 4P • Vs Bot AI • 3D Dice</span>
+            <button class="btn btn-neon-blue">Play Now ▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= VIEW 2: GAME ARENA ================= -->
+  <main id="gameArenaView" style="display:none;">
+    <div class="arena-topbar">
+      <div class="arena-title-group">
+        <button class="btn btn-secondary" onclick="showHubView()">← Back to Hub</button>
+        <span id="arenaGameTitle" class="arena-game-name">Game Title</span>
+
+        <!-- Level Selector for Tic-Tac-Toe (3x3, 4x4, 5x5) -->
+        <div id="gridSizeSelector" class="grid-size-selector" style="display:none;">
+          <button class="size-btn active" onclick="TicTacToeGame.setLevel(3)">3 × 3</button>
+          <button class="size-btn" onclick="TicTacToeGame.setLevel(4)">4 × 4</button>
+          <button class="size-btn" onclick="TicTacToeGame.setLevel(5)">5 × 5</button>
+        </div>
+
+        <!-- Mode Toggle (2-Player Duel vs Player vs Computer) -->
+        <div class="mode-toggle-group">
+          <button id="btnMode2P" class="size-btn active" onclick="setMatchMode('2P')">2 Players</button>
+          <button id="btnModeAI" class="size-btn" onclick="setMatchMode('AI')">🤖 Vs Computer</button>
+        </div>
+      </div>
+      <div>
+        <button class="btn btn-gold" onclick="ActiveGame.reset()">↻ Reset Game</button>
+      </div>
+    </div>
+
+    <div class="game-container">
+      <!-- BOARD STAGE -->
+      <section class="board-stage">
+        <div class="board-header">
+          <div id="turnBadge" class="turn-pill turn-p1">
+            <span>🐅</span>
+            <span id="turnText">Turn: Player 1</span>
+          </div>
+
+          <div class="timer-box">
+            <span style="font-size:13px;">⏱️</span>
+            <div class="timer-progress-wrap">
+              <div id="timerProgressBar" class="timer-progress-bar"></div>
+            </div>
+            <span id="timerClockDisplay" class="timer-clock">Waiting</span>
+          </div>
+
+          <div id="statusPrompt" class="status-prompt">Awaiting on-board start</div>
+        </div>
+
+        <div class="stage-canvas-wrapper" id="boardStageWrapper">
+          <!-- ON-BOARD ACTIVATION OVERLAY -->
+          <div id="boardStartOverlay" class="board-overlay-lock">
+            <h2 id="overlayTitle" style="font-size:26px; font-weight:900; color:#00f3ff; text-transform:uppercase;">Game Ready</h2>
+            <p style="font-size:13px; color:#cbd5e1;">Click below to activate and unlock the board</p>
+            <button class="btn btn-neon-blue" style="font-size:15px; padding:12px 28px;" onclick="triggerStartGameOnBoard()">
+              ▶ Start Game on Board
+            </button>
+          </div>
+
+
+          <!-- CYBER NEON LUDO STAGE -->
+          <div id="ludoStageWrapper" style="display:none; width:100%; max-width:540px; aspect-ratio:1/1; position:relative; margin:auto;">
+            <div id="board-grid" class="ludo-grid"></div>
+            <div style="margin-top:14px; display:flex; justify-content:center; align-items:center; gap:12px;">
+              <span id="diceResultNumber" style="font-size:16px; font-weight:800; color:#00f3ff; background:#101626; border:1px solid #1c2a44; padding:6px 14px; border-radius:10px;">🎲 Ready</span>
+              <button onclick="LudoGame.rollDice()" class="btn btn-gold" style="font-size:14px; padding:8px 20px;">
+                🎲 Roll Dice
+              </button>
+            </div>
+          </div>
+          <!-- NEON TIC-TAC-TOE BOARD (3x3, 4x4, 5x5) -->
+          <div id="neonGridContainer" style="display:none;"></div>
+
+          <!-- PULI-MAKA SVG BOARD -->
+          <svg id="boardSvg" class="board-svg" viewBox="-60 -60 1020 620" style="display:none;">
+            <defs>
+              <filter id="p1Glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ef4444" flood-opacity="0.8"/></filter>
+              <filter id="p2Glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00f3ff" flood-opacity="0.8"/></filter>
+            </defs>
+            <g id="edgesGroup"></g>
+            <g id="nodesGroup"></g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <!-- COMPETITORS -->
+        <div class="card">
+          <div class="card-title">
+            <span>Competitors</span>
+            <button style="background:none; border:none; color:var(--accent-gold); font-size:11px; cursor:pointer;" onclick="openNameModal()">Change</button>
+          </div>
+          <div class="player-row">
+            <div class="player-identity">
+              <div id="avatarP1" class="player-avatar avatar-p1">P</div>
+              <span id="labelPlayer1" class="player-name-text">Player 1</span>
+            </div>
+            <span id="badgeP1Role" style="font-size:11px; color:#ff007f; font-weight:700;">Player 1</span>
+          </div>
+
+          <div class="player-row">
+            <div class="player-identity">
+              <div id="avatarP2" class="player-avatar avatar-p2">P</div>
+              <span id="labelPlayer2" class="player-name-text">Player 2</span>
+            </div>
+            <span id="badgeP2Role" style="font-size:11px; color:#00f3ff; font-weight:700;">Player 2</span>
+          </div>
+        </div>
+
+        <!-- SCORECARD -->
+        <div class="card">
+          <div class="card-title">
+            <span>Match Scorecard</span>
+            <span id="matchStateBadge" style="color:var(--accent-gold); font-size:11px;">Active</span>
+          </div>
+          <div class="score-grid">
+            <div class="score-tile">
+              <div id="statBox1Val" class="score-val" style="color:#ff007f;">0</div>
+              <div id="statBox1Label" class="score-label">Stat 1</div>
+            </div>
+            <div class="score-tile">
+              <div id="statBox2Val" class="score-val" style="color:#00f3ff;">0</div>
+              <div id="statBox2Label" class="score-label">Stat 2</div>
+            </div>
+            <div class="score-tile">
+              <div id="statBox3Val" class="score-val" style="color:#ffaa00;">0</div>
+              <div id="statBox3Label" class="score-label">Stat 3</div>
+            </div>
+            <div class="score-tile">
+              <div id="moveCountVal" class="score-val" style="color:#fbbf24;">0</div>
+              <div id="moveCountLabel" class="score-label">Total Moves</div>
+            </div>
+          </div>
+
+          <!-- P2 ACTIONS (For Coin to Win) -->
+          <div id="p2ActionSection" style="margin-top:14px; display:none;">
+            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700; margin-bottom:6px;">
+              <span id="p2ActionHeader">Player 2 Action</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="btnModePlace" class="mode-btn active" onclick="PuliMakaGame.setMode('place')">
+                📥 Place Reserve (<span id="btnReserveCount">16</span>)
+              </button>
+              <button id="btnModeMove" class="mode-btn" onclick="PuliMakaGame.setMode('move')" disabled>
+                🔄 Move on Board
+              </button>
+            </div>
+            <div id="phaseNote" style="font-size:11px; color:var(--accent-gold); margin-top:6px;">
+              ⚠️ Player 2 can only move on board after placing all reserve coins.
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR ADSENSE SLOT -->
+        <div class="adsense-slot-wrapper sidebar-ad-slot">
+          <div class="adsense-placeholder side-placeholder">
+            <span class="ad-label">ADVERTISEMENT</span>
+            <p class="ad-subtext">Google AdSense Responsive Rectangle (300x250)</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ================= BOTTOM ADSENSE BANNER CONTAINER ================= -->
+  <div class="adsense-slot-wrapper bottom-ad-slot">
+    <div class="adsense-placeholder">
+      <span class="ad-label">ADVERTISEMENT</span>
+      <p class="ad-subtext">Google AdSense Responsive Anchor / Bottom Banner</p>
+    </div>
+  </div>
+
+  <!-- PLAYER NAMES MODAL -->
+  <div id="nameModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-size:17px; font-weight:800; color:#00f3ff;">Player Setup</h3>
+        <button style="background:none; border:none; color:var(--text-secondary); font-size:18px; cursor:pointer;" onclick="closeNameModal()">✕</button>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Player 1 Name</label>
+        <input type="text" id="inputP1Name" class="name-input" value="Player 1" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Player 2 Name</label>
+        <input type="text" id="inputP2Name" class="name-input" value="Player 2" />
+      </div>
+
+      <button class="btn btn-neon-blue" style="width:100%; justify-content:center; padding:10px; margin-top:10px;" onclick="savePlayerNames()">
+        Save Names & Play
+      </button>
+    </div>
+  </div>
+
+  <!-- WINNING / DRAW MODAL -->
+  <div id="winModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div id="winTrophy" style="font-size:50px;">🏆</div>
+      <h2 id="winHeaderTitle" style="font-size:24px; font-weight:900; margin-top:8px;">MATCH RESULT</h2>
+      <div id="winPlayerName" style="font-size:24px; font-weight:900; margin:10px 0; color:#fff;">PLAYER</div>
+      <div id="winDetails" style="font-size:13px; color:#cbd5e1; margin-bottom:16px;">Details</div>
+      <div id="winCoinAward" style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.4); border-radius:30px; padding:8px 18px; display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:#4ade80; margin-bottom:20px;">
+        <span>🪙</span>
+        <span id="winCoinText">+25 COINS CREDITED</span>
+      </div>
+      <div>
+        <button class="btn btn-neon-blue" style="font-size:15px; padding:12px 28px;" onclick="closeWinModalAndReset()">
+          Play Next Match ↻
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOAD INDEPENDENT GAME ENGINES -->
+  <script src="games/tictactoe.js"></script>
+  <script src="games/pulimaka.js"></script>
+  <script src="games/ludo.js"></script>
+
+  <!-- MAIN CORE PORTAL SCRIPT -->
+  <script>
+    let player1Name = "Player 1";
+    let player2Name = "Player 2";
+    let isAiMode = false;
+    let playerBalance = 100;
+    const MATCH_WIN_REWARD = 25;
+
+    let ActiveGame = null;
+    let activeGameId = "tictactoe";
+
+    // Audio Engine
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type = 'sine', duration = 0.12) {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function getP1Initial() { return player1Name.trim().charAt(0).toUpperCase() || "O"; }
+    function getP2Initial() { return isAiMode ? "AI" : (player2Name.trim().charAt(0).toUpperCase() || "X"); }
+
+    function showHubView() {
+      if (ActiveGame && ActiveGame.pauseTimer) ActiveGame.pauseTimer();
+      document.getElementById("homeHubView").style.display = "block";
+      document.getElementById("gameArenaView").style.display = "none";
+      document.getElementById("btnNavHub").style.display = "none";
+    }
+
+    function launchGame(gameId) {
+      activeGameId = gameId;
+      document.getElementById("homeHubView").style.display = "none";
+      document.getElementById("gameArenaView").style.display = "block";
+      document.getElementById("btnNavHub").style.display = "inline-flex";
+
+      if (gameId === "tictactoe") {
+        ActiveGame = TicTacToeGame;
+      } else if (gameId === "pulimaka") {
+        ActiveGame = PuliMakaGame;
+      } else if (gameId === "ludo") {
+        ActiveGame = LudoGame;
+      }
+
+      ActiveGame.init();
+    }
+
+    function setMatchMode(mode) {
+      isAiMode = (mode === 'AI');
+      document.getElementById('btnMode2P').classList.toggle('active', !isAiMode);
+      document.getElementById('btnModeAI').classList.toggle('active', isAiMode);
+
+      const p2Label = document.getElementById('labelPlayer2');
+      if (isAiMode) {
+        p2Label.textContent = "Computer (AI)";
+      } else {
+        p2Label.textContent = player2Name;
+      }
+      document.getElementById('avatarP2').textContent = getP2Initial();
+
+      if (ActiveGame && ActiveGame.setAiMode) {
+        ActiveGame.setAiMode(isAiMode);
+      }
+      if (ActiveGame && ActiveGame.reset) {
+        ActiveGame.reset();
+      }
+    }
+
+    function triggerStartGameOnBoard() {
+      if (ActiveGame && ActiveGame.startOnBoard) {
+        ActiveGame.startOnBoard();
+      }
+    }
+
+    function openNameModal() {
+      document.getElementById("inputP1Name").value = player1Name;
+      document.getElementById("inputP2Name").value = player2Name;
+      document.getElementById("nameModal").classList.add("open");
+    }
+    function closeNameModal() { document.getElementById("nameModal").classList.remove("open"); }
+    function savePlayerNames() {
+      const p1 = document.getElementById("inputP1Name").value.trim();
+      const p2 = document.getElementById("inputP2Name").value.trim();
+      if (p1) player1Name = p1;
+      if (p2) player2Name = p2;
+      document.getElementById("labelPlayer1").textContent = player1Name;
+      if (!isAiMode) document.getElementById("labelPlayer2").textContent = player2Name;
+      document.getElementById("avatarP1").textContent = getP1Initial();
+      document.getElementById("avatarP2").textContent = getP2Initial();
+      closeNameModal();
+      if (ActiveGame && ActiveGame.render) ActiveGame.render();
+    }
+
+    function triggerWinCelebration(winnerName, reason) {
+      if (ActiveGame && ActiveGame.pauseTimer) ActiveGame.pauseTimer();
+      playerBalance += MATCH_WIN_REWARD;
+      document.getElementById("topWalletBalance").textContent = playerBalance;
+
+      document.getElementById("winPlayerName").textContent = winnerName.toUpperCase();
+      document.getElementById("winDetails").textContent = reason;
+      document.getElementById("winTrophy").textContent = "🏆";
+      document.getElementById("winModal").classList.add("open");
+
+      playTone(523, 'triangle', 0.15);
+      setTimeout(() => playTone(659, 'triangle', 0.15), 160);
+      setTimeout(() => playTone(784, 'triangle', 0.3), 320);
+
+      startCelebrationAnimation();
+    }
+
+    function triggerDrawModal(reason) {
+      if (ActiveGame && ActiveGame.pauseTimer) ActiveGame.pauseTimer();
+      document.getElementById("winPlayerName").textContent = "MATCH DRAW!";
+      document.getElementById("winDetails").textContent = reason;
+      document.getElementById("winTrophy").textContent = "🤝";
+      document.getElementById("winModal").classList.add("open");
+    }
+
+    function closeWinModalAndReset() {
+      document.getElementById("winModal").classList.remove("open");
+      stopCelebrationAnimation();
+      if (ActiveGame && ActiveGame.reset) ActiveGame.reset();
+    }
+
+    // Confetti Engine
+    const canvas = document.getElementById("celebrationCanvas");
+    const ctx = canvas.getContext("2d");
+    let animFrameId = null;
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener("resize", resizeCanvas);
+
+    function startCelebrationAnimation() {
+      resizeCanvas();
+      canvas.style.display = "block";
+      particles = [];
+      const colors = ["#ff007f", "#00f3ff", "#9d00ff", "#ffaa00", "#00ff88", "#ffffff"];
+      for (let i = 0; i < 160; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height * 0.5,
+          w: Math.random() * 8 + 4,
+          h: Math.random() * 10 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 4,
+          vy: Math.random() * 4 + 3,
+          angle: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 8
+        });
+      }
+      animateParticles();
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += p.rotSpeed;
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.angle * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      animFrameId = requestAnimationFrame(animateParticles);
+    }
+
+    function stopCelebrationAnimation() {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = "none";
+    }
+
+    window.onload = () => {
+      showHubView();
+    };
+  </script>
+</body>
+</html>
